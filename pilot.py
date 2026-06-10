@@ -1,87 +1,75 @@
 class Pilot:
     """
-Data model for a pilot record
+        Data model for a pilot record
 
-    Maps to the Pilot table in FlightManagement.db
-    Getters, setters and a __str__ for DB insertion
+        Maps to the Pilot table in FlightManagement.db
+        Getters, setters and a __str__ for DB insertion
     """
 
     def __init__(self):
         """
-Default empty values
+            Default empty values
         """
         self.pilotID = 0
         self.name = ''
-        self.licenceNumber = ''
         self.rank = ''
         self.flightTime = 0
 
     def set_pilot_id(self, pilotID):
         """
-Set pilot ID
+            Set pilot ID
         """
         self.pilotID = pilotID
 
     def set_name(self, name):
         """
-Set pilot full name
+            Set pilot full name
         """
         self.name = name
 
-    def set_licence_number(self, licenceNumber):
-        """
-Set licence number
-        """
-        self.licenceNumber = licenceNumber
-
     def set_rank(self, rank):
         """
-Set rank, e.g. Captain, First Officer
+            Set rank, e.g. Captain, First Officer
         """
         self.rank = rank
 
     def set_flight_time(self, flightTime):
         """
-Set total flight hours logged
+            Set total flight hours logged
         """
         self.flightTime = flightTime
 
     def get_pilot_id(self):
         """
-Retur pilot ID
+            Retur pilot ID
         """
         return self.pilotID
 
     def get_name(self):
         """
-Return name
+            Return name
         """
         return self.name
 
-    def get_licence_number(self):
-        """
-Return licence number
-        """
-        return self.licenceNumber
-
     def get_rank(self):
         """
-Return rank
+            Return rank
         """
         return self.rank
 
     def get_flight_time(self):
         """
-Return total flight time
+            Return total flight time
         """
         return self.flightTime
 
     def __str__(self):
         """
-Newline-separated string for DB insertion
+            Newline-separated string for DB insertion
 
-        Order matches Pilot table column order
+            Order matches Pilot table column order
         """
-        return (str(self.pilotID) + "\n" + self.name + "\n" +
-                self.licenceNumber + "\n" + self.rank + "\n" +
+        return (str(self.pilotID) + "\n" +
+                self.name    + "\n" +
+                self.rank    + "\n" +
                 str(self.flightTime))

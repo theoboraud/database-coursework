@@ -6,18 +6,17 @@ from airport import Airport
 
 class DBOperations:
     """
-Handles all DB interactions for FlightManagement.db
+        Handles all DB interactions for FlightManagement.db
 
-    One method per menu option
-    Pattern: open connection, run SQL, commit/fetch, close in finally
-    SQL strings kept as class constants for easy editing
+        One method per menu option
+        Pattern: open connection, run SQL, commit/fetch, close in finally
+        SQL strings kept as class constants for easy editing
     """
 
     sql_create_pilot = """
         CREATE TABLE IF NOT EXISTS Pilot (
             PilotID       INTEGER     NOT NULL,
             Name          VARCHAR(50) NOT NULL,
-            LicenceNumber VARCHAR(20) NOT NULL UNIQUE,
             Rank          VARCHAR(20) NOT NULL,
             FlightTime    INTEGER     NOT NULL DEFAULT 0,
             PRIMARY KEY (PilotID)
@@ -46,8 +45,8 @@ Handles all DB interactions for FlightManagement.db
         )"""
 
     sql_insert_pilot = """
-        INSERT INTO Pilot (PilotID, Name, LicenceNumber, Rank, FlightTime)
-        VALUES (?, ?, ?, ?, ?)"""
+        INSERT INTO Pilot (PilotID, Name, Rank, FlightTime)
+        VALUES (?, ?, ?, ?)"""
 
     sql_insert_airport = """
         INSERT INTO Airport (AirportID, AirportName, City, Country, Timezone)
@@ -180,10 +179,10 @@ Handles all DB interactions for FlightManagement.db
 
     def __init__(self):
         """
-Connect and create tables if missing
+            Connect and create tables if missing
 
-        Called every loop iteration
-        IF NOT EXISTS makes this safe to call repeatedly
+            Called every loop iteration
+            IF NOT EXISTS makes this safe to call repeatedly
         """
         try:
             self.conn = sqlite3.connect("FlightManagement.db")
@@ -199,10 +198,10 @@ Connect and create tables if missing
 
     def get_connection(self):
         """
-Open a fresh connection and cursor
+            Open a fresh connection and cursor
 
-        Call at start of any method needing DB access
-        Connection is close in the finally block each time
+            Call at start of any method needing DB access
+            Connection is close in the finally block each time
         """
         self.conn = sqlite3.connect("FlightManagement.db")
         self.cur = self.conn.cursor()
@@ -213,11 +212,11 @@ Open a fresh connection and cursor
 
     def parse_utc_offset(self, timezone_str):
         """
-Parse UTC offset string to int
+            Parse UTC offset string to int
 
-        e.g. UTC+1 -> 1, UTC-5 -> -5
+            e.g. UTC+1 -> 1, UTC-5 -> -5
 
-        Parameters:
+            Parameters:
             timezone_str -- UTC+X or UTC-X string
         """
         tz = timezone_str.strip().upper().replace("UTC", "")
@@ -225,9 +224,9 @@ Parse UTC offset string to int
 
     def local_to_utc(self, local_time_str, timezone_str):
         """
-Convert local time to UTC by subtracting the offset
+            Convert local time to UTC by subtracting the offset
 
-        Parameters:
+            Parameters:
             local_time_str -- YYYY-MM-DD HH:MM local time
             timezone_str   -- UTC offset string, e.g. UTC+1
         """
@@ -239,9 +238,9 @@ Convert local time to UTC by subtracting the offset
 
     def utc_to_local(self, utc_time_str, timezone_str):
         """
-Convert UTC time to local by adding the offset
+            Convert UTC time to local by adding the offset
 
-        Parameters:
+            Parameters:
             utc_time_str -- YYYY-MM-DD HH:MM UTC
             timezone_str -- UTC offset string, e.g. UTC+1
         """
@@ -257,12 +256,12 @@ Convert UTC time to local by adding the offset
 
     def print_flight_row(self, row):
         """
-Print one flight record
+            Print one flight record
 
-        Expects a row from any flight SELECT joining Flight, Airport x2, Pilot
-        Column order: FlightID, DepUTC, ArrUTC, Status,
-        OriginID, OriginCity, DestID, DestCity, PilotName, OriginTZ, DestTZ
-        Times shown as local + UTC in brackets
+            Expects a row from any flight SELECT joining Flight, Airport x2, Pilot
+            Column order: FlightID, DepUTC, ArrUTC, Status,
+            OriginID, OriginCity, DestID, DestCity, PilotName, OriginTZ, DestTZ
+            Times shown as local + UTC in brackets
         """
         utc_dep = row[1]
         utc_arr = row[2]
@@ -281,11 +280,11 @@ Print one flight record
 
     def next_available_id(self, used_ids):
         """
-Smallest positive int not in used_ids
+            Smallest positive int not in used_ids
 
-        e.g. {1,2,3,5} -> 4, {1,2,3} -> 4, never returns 0
+            e.g. {1,2,3,5} -> 4, {1,2,3} -> 4, never returns 0
 
-        Parameters:
+            Parameters:
             used_ids -- set of ints already taken
         """
         i = 1
@@ -295,11 +294,11 @@ Smallest positive int not in used_ids
 
     def print_table(self, headers, rows):
         """
-Two-column aligned table with header and separator
+            Two-column aligned table with header and separator
 
-        Column widths calculated from widest value so pipes always line up
+            Column widths calculated from widest value so pipes always line up
 
-        Parameters:
+            Parameters:
             headers -- tuple of two header strings
             rows    -- list of two-element tuples
         """
@@ -318,11 +317,11 @@ Two-column aligned table with header and separator
 
     def random_flight_id(self, used_ids):
         """
-Random flight ID: 2 uppercase letters + 3 digits, not in used_ids
+            Random flight ID: 2 uppercase letters + 3 digits, not in used_ids
 
-        Keeps trying until unique
+            Keeps trying until unique
 
-        Parameters:
+            Parameters:
             used_ids -- set of FlightIDs already taken
         """
         import random, string
@@ -337,10 +336,10 @@ Random flight ID: 2 uppercase letters + 3 digits, not in used_ids
 
     def pick_new_flight_id(self):
         """
-Ask for a FlightID not already in use
+            Ask for a FlightID not already in use
 
-        Show taken IDs, default is random (2 letters + 3 digits)
-        Loop until valid unused ID entered
+            Show taken IDs, default is random (2 letters + 3 digits)
+            Loop until valid unused ID entered
         """
         self.cur.execute("SELECT FlightID FROM Flight ORDER BY FlightID")
         flights = self.cur.fetchall()
@@ -370,11 +369,11 @@ Ask for a FlightID not already in use
 
     def pick_existing_flight_id(self, prompt="Enter Flight ID: "):
         """
-Ask for an existing FlightID
+            Ask for an existing FlightID
 
-        Show the ID list, loop until valid
+            Show the ID list, loop until valid
 
-        Parameters:
+            Parameters:
             prompt -- input prompt string
         """
         self.cur.execute("SELECT FlightID FROM Flight ORDER BY FlightID")
@@ -399,9 +398,9 @@ Ask for an existing FlightID
 
     def pick_new_pilot_id(self):
         """
-Ask for a PilotID not already in use
+            Ask for a PilotID not already in use
 
-        Show taken IDs, loop until unused int entered
+            Show taken IDs, loop until unused int entered
         """
         self.cur.execute("SELECT PilotID, Name FROM Pilot ORDER BY PilotID")
         pilots = self.cur.fetchall()
@@ -425,10 +424,10 @@ Ask for a PilotID not already in use
 
     def pick_existing_pilot_id(self):
         """
-Ask for an existing PilotID
+            Ask for an existing PilotID
 
-        Show pilot list, loop until valid
-        Blank input picks a random pilot as default
+            Show pilot list, loop until valid
+            Blank input picks a random pilot as default
         """
         import random
         self.cur.execute(self.sql_select_all_pilots)
@@ -455,9 +454,9 @@ Ask for an existing PilotID
 
     def pick_new_airport_id(self):
         """
-Ask for an AirportID not already in use
+            Ask for an AirportID not already in use
 
-        Must be exactly 3 letters, unused IATA code
+            Must be exactly 3 letters, unused IATA code
         """
         self.cur.execute("SELECT AirportID, City FROM Airport ORDER BY AirportID")
         airports = self.cur.fetchall()
@@ -477,13 +476,13 @@ Ask for an AirportID not already in use
 
     def pick_existing_airport_id(self, prompt="Enter Airport ID: ", exclude=None):
         """
-Ask for an existing AirportID
+            Ask for an existing AirportID
 
-        Show airport list, loop until valid
-        Blank input picks a random airport as default
-        Random default never matches exclude
+            Show airport list, loop until valid
+            Blank input picks a random airport as default
+            Random default never matches exclude
 
-        Parameters:
+            Parameters:
             prompt  -- input prompt string
             exclude -- AirportID to disallow, e.g. origin when picking destination
         """
@@ -517,11 +516,11 @@ Ask for an existing AirportID
 
     def create_tables(self):
         """
-Drop and recreate all three tables
+            Drop and recreate all three tables
 
-        Flight dropped first as it holds FKs to Airport and Pilot
-        Any existing data will be lost
-        Also calls insert_sample_data
+            Flight dropped first as it holds FKs to Airport and Pilot
+            Any existing data will be lost
+            Also calls insert_sample_data
         """
         try:
             self.get_connection()
@@ -541,27 +540,27 @@ Drop and recreate all three tables
 
     def insert_sample_data(self):
         """
-Populate all three tables with sample data
+            Populate all three tables with sample data
 
-        12 pilots, 12 airports, 15 flights via executemany
-        Timezones in UTC+/-X format
+            12 pilots, 12 airports, 15 flights via executemany
+            Timezones in UTC+/-X format
         """
         try:
             self.get_connection()
 
             pilots = [
-                (1,  "James Carter",   "LIC001", "Captain",        4200),
-                (2,  "Sarah Mitchell", "LIC002", "Captain",        3800),
-                (3,  "David Nguyen",   "LIC003", "First Officer",  1500),
-                (4,  "Emily Clarke",   "LIC004", "First Officer",  1200),
-                (5,  "Robert Khan",    "LIC005", "Captain",        5100),
-                (6,  "Laura Patel",    "LIC006", "Captain",        4700),
-                (7,  "Michael Ross",   "LIC007", "First Officer",  900),
-                (8,  "Anna Schmidt",   "LIC008", "Second Officer", 400),
-                (9,  "Tom Bradley",    "LIC009", "Captain",        6200),
-                (10, "Nina Okafor",    "LIC010", "First Officer",  1100),
-                (11, "Carlos Rivera",  "LIC011", "Captain",        3300),
-                (12, "Yuki Tanaka",    "LIC012", "Second Officer", 600),
+                (1,  "James Carter", "Captain",        4200),
+                (2,  "Sarah Mitchell", "Captain",        3800),
+                (3,  "David Nguyen", "First Officer",  1500),
+                (4,  "Emily Clarke", "First Officer",  1200),
+                (5,  "Robert Khan", "Captain",        5100),
+                (6,  "Laura Patel", "Captain",        4700),
+                (7,  "Michael Ross", "First Officer",  900),
+                (8,  "Anna Schmidt", "Second Officer", 400),
+                (9,  "Tom Bradley", "Captain",        6200),
+                (10, "Nina Okafor", "First Officer",  1100),
+                (11, "Carlos Rivera", "Captain",        3300),
+                (12, "Yuki Tanaka", "Second Officer", 600),
             ]
 
             airports = [
@@ -614,10 +613,10 @@ Populate all three tables with sample data
 
     def select_all_flights(self):
         """
-Show all flights
+            Show all flights
 
-        Double JOIN on Airport (origin + destination) and JOIN on Pilot
-        Shows names/cities instead of raw IDs
+            Double JOIN on Airport (origin + destination) and JOIN on Pilot
+            Shows names/cities instead of raw IDs
         """
         try:
             self.get_connection()
@@ -637,12 +636,12 @@ Show all flights
 
     def view_flights_by_criteria(self):
         """
-Filter flights by origin, destination, status, or date
+            Filter flights by origin, destination, status, or date
 
-        Sub-menu with 5 options
-        Origin/dest: pick from airport list
-        Status: numbered choice 1/2/3
-        Date: pick from list of existing dates
+            Sub-menu with 5 options
+            Origin/dest: pick from airport list
+            Status: numbered choice 1/2/3
+            Date: pick from list of existing dates
         """
         try:
             self.get_connection()
@@ -754,9 +753,9 @@ Filter flights by origin, destination, status, or date
 
     def search_flight(self):
         """
-Find and show one flight by FlightID
+            Find and show one flight by FlightID
 
-        Double JOIN on Airport + Pilot for full details
+            Double JOIN on Airport + Pilot for full details
         """
         try:
             self.get_connection()
@@ -777,11 +776,11 @@ Find and show one flight by FlightID
 
     def add_flight(self):
         """
-Insert a new flight
+            Insert a new flight
 
-        Collects fields in display order: ID, Origin, Dep, Dest, Arr, Pilot, Status
-        Origin and destination validate against Airport table
-        Times entered as local, stored as UTC
+            Collects fields in display order: ID, Origin, Dep, Dest, Arr, Pilot, Status
+            Origin and destination validate against Airport table
+            Times entered as local, stored as UTC
         """
         try:
             self.get_connection()
@@ -865,11 +864,11 @@ Insert a new flight
 
     def update_flight(self):
         """
-Update any field on an existing flight
+            Update any field on an existing flight
 
-        Displays current details first
-        Sub-menu loops until user goes back
-        Current value shown as default, Enter keeps it
+            Displays current details first
+            Sub-menu loops until user goes back
+            Current value shown as default, Enter keeps it
         """
         try:
             self.get_connection()
@@ -1025,10 +1024,10 @@ Update any field on an existing flight
 
     def delete_flight(self):
         """
-Delete a flight by FlightID
+            Delete a flight by FlightID
 
-        Asks for confirmation first
-        rowcount used to confirm deletion
+            Asks for confirmation first
+            rowcount used to confirm deletion
         """
         try:
             self.get_connection()
@@ -1055,7 +1054,7 @@ Delete a flight by FlightID
 
     def select_all_pilots(self):
         """
-Show all pilots
+            Show all pilots
         """
         try:
             self.get_connection()
@@ -1067,9 +1066,8 @@ Show all pilots
                     print("-" * 50)
                     print(f"  Pilot ID      : {row[0]}")
                     print(f"  Name          : {row[1]}")
-                    print(f"  Licence No    : {row[2]}")
-                    print(f"  Rank          : {row[3]}")
-                    print(f"  Flight Time   : {row[4]}")
+                    print(f"  Rank          : {row[2]}")
+                    print(f"  Flight Time   : {row[3]}")
                 print("-" * 50)
             else:
                 print("No pilots found.")
@@ -1080,10 +1078,10 @@ Show all pilots
 
     def view_pilot_schedule(self):
         """
-Show all flights for a given pilot
+            Show all flights for a given pilot
 
-        Filters by PilotID, double JOIN on Airport
-        Ordered by departure time
+            Filters by PilotID, double JOIN on Airport
+            Ordered by departure time
         """
         try:
             self.get_connection()
@@ -1116,17 +1114,16 @@ Show all flights for a given pilot
 
     def add_pilot(self):
         """
-Insert a new pilot
+            Insert a new pilot
 
-        PilotID validated as unique before insert
-        New pilot displayed on success
+            PilotID validated as unique before insert
+            New pilot displayed on success
         """
         try:
             self.get_connection()
             pilot = Pilot()
             pilot.set_pilot_id(self.pick_new_pilot_id())
             pilot.set_name(input("Enter pilot name: "))
-            pilot.set_licence_number(input("Enter licence number: "))
             pilot.set_rank(input("Enter rank (Captain/First Officer/Second Officer): "))
             pilot.set_flight_time(int(input("Enter flight time (hours): ")))
             print()
@@ -1134,7 +1131,6 @@ Insert a new pilot
             self.cur.execute(self.sql_insert_pilot, (
                 pilot.get_pilot_id(),
                 pilot.get_name(),
-                pilot.get_licence_number(),
                 pilot.get_rank(),
                 pilot.get_flight_time()
             ))
@@ -1143,7 +1139,6 @@ Insert a new pilot
             print("-" * 50)
             print(f"  Pilot ID      : {pilot.get_pilot_id()}")
             print(f"  Name          : {pilot.get_name()}")
-            print(f"  Licence No    : {pilot.get_licence_number()}")
             print(f"  Rank          : {pilot.get_rank()}")
             print(f"  Flight Time   : {pilot.get_flight_time()}")
             print("-" * 50)
@@ -1154,10 +1149,10 @@ Insert a new pilot
 
     def assign_pilot(self):
         """
-Assign a pilot to a flight
+            Assign a pilot to a flight
 
-        Updates PilotID FK in Flight
-        Both flight and pilot validated before update
+            Updates PilotID FK in Flight
+            Both flight and pilot validated before update
         """
         try:
             self.get_connection()
@@ -1183,10 +1178,10 @@ Assign a pilot to a flight
 
     def summary_flights_by_pilot(self):
         """
-Flight count grouped by pilot
+            Flight count grouped by pilot
 
-        LEFT JOIN so pilots with no flights still show
-        Ordered by total DESC
+            LEFT JOIN so pilots with no flights still show
+            Ordered by total DESC
         """
         try:
             self.get_connection()
@@ -1210,7 +1205,7 @@ Flight count grouped by pilot
 
     def select_all_airports(self):
         """
-Show all airports
+            Show all airports
         """
         try:
             self.get_connection()
@@ -1235,10 +1230,10 @@ Show all airports
 
     def print_airport_row(self, row):
         """
-Print one airport record
+            Print one airport record
 
-        Expects row from Airport SELECT
-        Column order: AirportID, AirportName, City, Country, Timezone
+            Expects row from Airport SELECT
+            Column order: AirportID, AirportName, City, Country, Timezone
         """
         print("-" * 50)
         print(f"  Airport ID   : {row[0]}")
@@ -1250,12 +1245,12 @@ Print one airport record
 
     def parse_timezone_input(self, prompt, default=None):
         """
-Ask for a UTC offset int and return formatted timezone string
+            Ask for a UTC offset int and return formatted timezone string
 
-        User enters int, e.g. 1 -> UTC+1, -5 -> UTC-5
-        Enter keeps default if provided
+            User enters int, e.g. 1 -> UTC+1, -5 -> UTC-5
+            Enter keeps default if provided
 
-        Parameters:
+            Parameters:
             prompt  -- prompt string
             default -- value to keep on blank input
         """
@@ -1273,11 +1268,11 @@ Ask for a UTC offset int and return formatted timezone string
 
     def view_update_airport_information(self):
         """
-View and update any field on an existing airport
+            View and update any field on an existing airport
 
-        Display details first, then sub-menu loops until back
-        Current value is default, Enter keeps it
-        ID rename propagated to Flight FK columns
+            Display details first, then sub-menu loops until back
+            Current value is default, Enter keeps it
+            ID rename propagated to Flight FK columns
         """
         try:
             self.get_connection()
@@ -1392,10 +1387,10 @@ View and update any field on an existing airport
 
     def add_airport(self):
         """
-Insert a new airport
+            Insert a new airport
 
-        AirportID must be 3 letters, unique
-        New airport displayed on success
+            AirportID must be 3 letters, unique
+            New airport displayed on success
         """
         try:
             self.get_connection()
@@ -1434,10 +1429,10 @@ Insert a new airport
 
     def summary_flights_by_airport(self):
         """
-Incoming flight count grouped by airport
+            Incoming flight count grouped by airport
 
-        LEFT JOIN so airports with no flights still show
-        Ordered by total DESC
+            LEFT JOIN so airports with no flights still show
+            Ordered by total DESC
         """
         try:
             self.get_connection()

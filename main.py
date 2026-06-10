@@ -3,10 +3,10 @@ from db_operations import DBOperations
 
 def print_menu():
     """
-Main menu, grouped by section
+        Main menu, grouped by section
 
-    Numbers are unique across the whole menu
-    Section headers are visual only
+        Numbers are unique across the whole menu
+        Section headers are visual only
     """
     print("\n ================================")
     print("   Flight Management System")
@@ -42,11 +42,11 @@ Main menu, grouped by section
 
 def handle_input(choice, db_ops):
     """
-Route menu choice to the right DBOperations method
+        Route menu choice to the right DBOperations method
 
-    Returns False on exit (0), True otherwise to keep the loop going
+        Returns False on exit (0), True otherwise to keep the loop going
 
-    Parameters:
+        Parameters:
         choice  -- integer entered by the user
         db_ops  -- DBOperations instance to call methods on
     """
